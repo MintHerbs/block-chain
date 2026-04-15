@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import HomePage from './pages/HomePage.jsx';
+import ChatPage from './pages/ChatPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import TemporalPage from './pages/TemporalPage.jsx';
 import Loader from './components/ui/Loader.jsx';
@@ -42,6 +43,7 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AuthLayout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/chat" element={<ChatPage />} />
           <Route path="/profile/:username" element={<ProfilePage />} />
           <Route path="/temporal" element={<TemporalPage />} />
         </Route>

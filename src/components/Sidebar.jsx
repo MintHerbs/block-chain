@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import Avatar from './ui/Avatar.jsx';
 import Dropdown from './ui/Dropdown.jsx';
-import { HomeIcon, TemporalIcon, PersonIcon, MoreIcon, LogoutIcon, FireIcon } from './ui/icons.jsx';
+import { HomeIcon, TemporalIcon, MessageCircleIcon, MoreIcon, LogoutIcon, FireIcon } from './ui/icons.jsx';
 import BurnModal from './BurnModal.jsx';
 import styles from './Sidebar.module.css';
 
@@ -41,19 +41,19 @@ export default function Sidebar() {
                 </NavLink>
 
                 <NavLink
+                    to="/chat"
+                    className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
+                >
+                    <MessageCircleIcon size={24} />
+                    <span>Chat</span>
+                </NavLink>
+
+                <NavLink
                     to="/temporal"
                     className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
                 >
                     <TemporalIcon size={24} />
                     <span>Temporal</span>
-                </NavLink>
-
-                <NavLink
-                    to={`/profile/${user?.username}`}
-                    className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
-                >
-                    <PersonIcon size={24} />
-                    <span>Profile</span>
                 </NavLink>
 
                 <div style={{ position: 'relative' }}>
