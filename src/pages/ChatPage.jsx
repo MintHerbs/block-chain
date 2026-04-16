@@ -107,7 +107,19 @@ export default function ChatPage() {
             }, 1000);
 
             try {
-                // 1. Clean stale queue entries and reset own entry
+                // 1. Clean up: end any lingering active sessions and reset queue entry.
+                //    Stale sessions from previous runs would otherwise be found by Step A
+                //    immediately, causing a false match transition.
+                const { data: staleSessions } = await supabase
+                    .from('chat_sessions')
+                    .select('id')
+                    .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
+                    .eq('is_active', true);
+                if (staleSessions) {
+                    for (const s of staleSessions) {
+                        await supabase.rpc('end_chat_session', { p_session_id: s.id });
+                    }
+                }
                 await supabase.rpc('clean_stale_queue');
                 await supabase.from('chat_queue').delete().eq('user_id', user.id);
                 await supabase.from('chat_queue').insert({ user_id: user.id });
@@ -136,6 +148,7 @@ export default function ChatPage() {
                         .select('id, user_a, user_b')
                         .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
                         .eq('is_active', true)
+                        .order('started_at', { ascending: false })
                         .limit(1);
 
                     if (existing && existing.length > 0 && mounted) {
@@ -144,17 +157,19 @@ export default function ChatPage() {
                     }
 
                     // Step B: try to create a new match.
-                    const { data: matchData } = await supabase.rpc('match_chat_users');
+                    const { data: matchData, error: matchError } = await supabase.rpc('match_chat_users');
+                    if (matchError) {
+                        console.error('match_chat_users RPC error:', matchError);
+                    }
                     if (matchData && matchData.length > 0 && mounted) {
-                        // Re-query to pick the canonical session in case of a race condition
-                        // where both users called match_chat_users simultaneously and two sessions
-                        // were created. Both users will independently re-query and pick the same
-                        // first result.
+                        // Re-query with consistent ORDER BY so both users always pick the same
+                        // session if a race condition created two simultaneously.
                         const { data: sessions } = await supabase
                             .from('chat_sessions')
                             .select('id, user_a, user_b')
                             .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
                             .eq('is_active', true)
+                            .order('started_at', { ascending: false })
                             .limit(1);
 
                         if (sessions && sessions.length > 0 && mounted) {
