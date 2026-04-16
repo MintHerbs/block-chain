@@ -33,6 +33,13 @@
     margin: 0;
 }
 
+.timeoutMessage {
+    font-size: 14px;
+    color: var(--warning);
+    font-weight: 600;
+    margin: 0;
+}
+
 /* ========== LOBBY STATE ========== */
 
 .lobbyContent {
