@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../config/supabase.js';
 import { verifyIntegrity, verifyBlockchainIntegrity } from '../security/hashIntegrity.js';
+import { verifyConfessionOnChain } from '../security/blockchainService.js';
 import IconButton from './ui/IconButton.jsx';
 import { CommentIcon, UpvoteIcon, DownvoteIcon, ShieldIcon } from './ui/icons.jsx';
 import styles from './ActionBar.module.css';
@@ -94,12 +95,18 @@ export default function ActionBar({
                 return;
             }
 
-            // If on chain, verify blockchain
-            if (isOnChain && blockchainTxHash) {
-                const { verified } = await verifyBlockchainIntegrity(blockchainTxHash, decryptedContent);
-                setVerifyStatus(verified === null ? 'pending' : verified ? 'verified' : 'failed');
-            } else {
+            // Verify against blockchain
+            const result = await verifyConfessionOnChain(confessionId, contentHash);
+
+            if (!result.onChain) {
+                // Not yet on blockchain — still within edit window or not opted in
+                setVerifyStatus('pending');
+            } else if (result.verified) {
+                // Hash matches blockchain record
                 setVerifyStatus('verified');
+            } else {
+                // Hash mismatch — content has been tampered with
+                setVerifyStatus('failed');
             }
         } catch {
             setVerifyStatus('failed');

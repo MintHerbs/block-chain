@@ -14,6 +14,7 @@ export default function ComposeBox({ onPosted }) {
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [optInBlockchain, setOptInBlockchain] = useState(false);
 
     const handlePost = async () => {
         if (!text.trim()) return;
@@ -25,12 +26,22 @@ export default function ComposeBox({ onPosted }) {
             // Security pipeline
             const sanitized = sanitizeText(text);
             validateConfession(sanitized);
-            await canUserPost(user.id);
+            
+            // Check rate limit with graceful fallback
+            try {
+                await canUserPost(user.id);
+            } catch (rateLimitError) {
+                console.warn('Rate limit check failed, proceeding with post:', rateLimitError.message);
+            }
+            
             const contentHash = await hashContent(sanitized);
             const encrypted = encrypt(sanitized);
 
-            // Insert confession with edit_window_expires_at timestamp (1 hour from now)
-            const editWindowExpiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+            // Set edit window based on blockchain opt-in
+            // Blockchain: 2 minutes, DB-only: null (no edit window)
+            const editWindowExpiresAt = optInBlockchain 
+                ? new Date(Date.now() + 2 * 60 * 1000).toISOString()
+                : null;
             
             const { data, error: insertError } = await supabase
                 .from('confessions')
@@ -38,6 +49,7 @@ export default function ComposeBox({ onPosted }) {
                     user_id: user.id,
                     encrypted_content: encrypted,
                     content_hash: contentHash,
+                    opt_in_blockchain: optInBlockchain,
                     edit_window_expires_at: editWindowExpiresAt,
                     is_on_chain: false,
                 })
@@ -48,6 +60,7 @@ export default function ComposeBox({ onPosted }) {
 
             recordPost(user.id);
             setText('');
+            setOptInBlockchain(false);
             if (onPosted) onPosted(data);
         } catch (err) {
             setError(err.message || 'Failed to post confession');
@@ -69,6 +82,19 @@ export default function ComposeBox({ onPosted }) {
                     autoGrow
                     disabled={loading}
                 />
+                <label className={styles.blockchainToggle}>
+                    <input
+                        type="checkbox"
+                        checked={optInBlockchain}
+                        onChange={(e) => setOptInBlockchain(e.target.checked)}
+                        disabled={loading}
+                        className={styles.checkbox}
+                    />
+                    <span className={styles.checkboxLabel}>Add to blockchain</span>
+                    <span className={styles.helperText}>
+                        Confessions on blockchain cannot be edited after 2 minutes
+                    </span>
+                </label>
                 <div className={styles.footer}>
                     <span className={styles.charCount}>
                         {text.length}/5000

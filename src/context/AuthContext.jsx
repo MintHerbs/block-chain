@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../config/supabase.js';
+import { storeUserOnChain } from '../security/blockchainService.js';
 
 const AuthContext = createContext(null);
 
@@ -60,6 +61,21 @@ export function AuthProvider({ children }) {
             dh_public_key: 'dh_placeholder',
         });
         if (insertError) throw insertError;
+
+        // Optionally store user on blockchain
+        // User can reject MetaMask prompt — signup still succeeds
+        try {
+            const chainResult = await storeUserOnChain(data.user.id, username);
+            if (chainResult.success) {
+                await supabase
+                    .from('users')
+                    .update({ blockchain_tx_hash: chainResult.txHash })
+                    .eq('id', data.user.id);
+            }
+        } catch (err) {
+            // Gracefully handle MetaMask rejection or errors
+            console.warn('Blockchain user storage skipped:', err.message);
+        }
     }
 
     async function signOut() {

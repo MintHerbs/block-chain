@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { supabase } from '../config/supabase.js';
+import { storeConfessionOnChain } from '../security/blockchainService.js';
 import PageHeader from '../components/ui/PageHeader.jsx';
 import ComposeBox from '../components/ComposeBox.jsx';
 import ConfessionFeed from '../components/ConfessionFeed.jsx';
@@ -14,6 +15,50 @@ export default function HomePage() {
     useEffect(() => {
         fetchConfessions();
     }, []);
+
+    useEffect(() => {
+        if (!user?.id) return;
+
+        async function processExpiredConfessions() {
+            // Find confessions that opted into blockchain, haven't been written yet,
+            // and whose edit window has passed — AND belong to the current user
+            const { data: expired } = await supabase
+                .from('confessions')
+                .select('id, content_hash')
+                .eq('user_id', user.id)
+                .eq('opt_in_blockchain', true)
+                .eq('is_on_chain', false)
+                .lt('edit_window_expires_at', new Date().toISOString())
+                .limit(5);   // process 5 at a time, don't spam MetaMask
+
+            if (!expired || expired.length === 0) return;
+
+            for (const c of expired) {
+                const result = await storeConfessionOnChain(c.id, c.content_hash);
+
+                if (result.success) {
+                    await supabase
+                        .from('confessions')
+                        .update({
+                            is_on_chain: true,
+                            blockchain_tx_hash: result.txHash,
+                        })
+                        .eq('id', c.id);
+
+                    await supabase
+                        .from('blockchain_sync_log')
+                        .insert({
+                            entity_type: 'confession',
+                            entity_id: c.id,
+                            tx_hash: result.txHash,
+                            status: 'confirmed',
+                        });
+                }
+            }
+        }
+
+        processExpiredConfessions();
+    }, [confessions, user]);
 
     const fetchConfessions = async (offset = 0) => {
         setLoading(true);
