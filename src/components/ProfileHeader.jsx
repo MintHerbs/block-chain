@@ -8,21 +8,34 @@ export default function ProfileHeader({
     isOwnProfile,
     temporalMode,
     onToggleTemporal,
+    onEditProfile,
 }) {
+    const coverColor = user.cover_color || '#FFDDD2';
+    
     return (
         <div className={styles.header}>
-            <div className={styles.cover} style={{ backgroundImage: 'url(/default-cover.jpg)' }} />
+            <div className={styles.cover} style={{ backgroundColor: coverColor }} />
             <div className={styles.info}>
                 <div className={styles.avatarRow}>
-                    <Avatar size="lg" />
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={onToggleTemporal}
-                        className={temporalMode ? styles.temporalActive : ''}
-                    >
-                        Temporal
-                    </Button>
+                    <Avatar size="lg" avatarIndex={user.avatar_index} />
+                    {isOwnProfile ? (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onEditProfile}
+                        >
+                            Edit Profile
+                        </Button>
+                    ) : (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onToggleTemporal}
+                            className={temporalMode ? styles.temporalActive : ''}
+                        >
+                            Temporal
+                        </Button>
+                    )}
                 </div>
                 <div className={styles.details}>
                     <div className={styles.nameRow}>

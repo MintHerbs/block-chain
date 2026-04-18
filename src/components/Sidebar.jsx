@@ -75,7 +75,7 @@ export default function Sidebar() {
 
             {user && (
                 <NavLink to={`/profile/${user.username}`} className={styles.userPill}>
-                    <Avatar size="sm" />
+                    <Avatar size="sm" avatarIndex={user.avatar_index} />
                     <div className={styles.userInfo}>
                         <div className={styles.displayName}>{user.display_name}</div>
                         <div className={styles.username}>@{user.username}</div>

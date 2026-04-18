@@ -11,7 +11,7 @@ export default function UserResultCard({ user }) {
             className={styles.card}
             onClick={() => navigate(`/profile/${user.username}`)}
         >
-            <Avatar size="sm" />
+            <Avatar size="sm" avatarIndex={user.avatar_index} />
             <div className={styles.info}>
                 <div className={styles.nameRow}>
                     <span className={styles.displayName}>{user.display_name}</span>

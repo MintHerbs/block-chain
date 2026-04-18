@@ -65,7 +65,7 @@ export default function HomePage() {
 
         const { data, error } = await supabase
             .from('confessions')
-            .select('*, users(display_name, username)')
+            .select('*, users(display_name, username, avatar_index)')
             .eq('is_deleted', false)
             .order('created_at', { ascending: false })
             .range(offset, offset + 49);

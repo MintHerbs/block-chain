@@ -20,7 +20,7 @@ export default function CommentSection({ confessionId, currentUserId, onCommentA
     const fetchComments = async () => {
         const { data, error } = await supabase
             .from('comments')
-            .select('*, users(display_name, username)')
+            .select('*, users(display_name, username, avatar_index)')
             .eq('confession_id', confessionId)
             .order('created_at', { ascending: true });
 
@@ -82,7 +82,7 @@ export default function CommentSection({ confessionId, currentUserId, onCommentA
                 ) : (
                     comments.map((comment) => (
                         <div key={comment.id} className={styles.comment}>
-                            <Avatar size="sm" />
+                            <Avatar size="sm" avatarIndex={comment.users?.avatar_index} />
                             <div className={styles.commentBody}>
                                 <div className={styles.meta}>
                                     <span className={styles.displayName}>

@@ -53,7 +53,7 @@ export default function ComposeBox({ onPosted }) {
                     edit_window_expires_at: editWindowExpiresAt,
                     is_on_chain: false,
                 })
-                .select('*, users(display_name, username)')
+                .select('*, users(display_name, username, avatar_index)')
                 .single();
 
             if (insertError) throw insertError;
@@ -71,7 +71,7 @@ export default function ComposeBox({ onPosted }) {
 
     return (
         <div className={styles.composeBox}>
-            <Avatar size="md" />
+            <Avatar size="md" avatarIndex={user?.avatar_index} />
             <div className={styles.content}>
                 <Textarea
                     placeholder="What's happening?"

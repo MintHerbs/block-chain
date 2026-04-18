@@ -1,0 +1,64 @@
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.avatarGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.avatarOption {
+    position: relative;
+    aspect-ratio: 1;
+    border: 3px solid transparent;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface);
+    padding: 0;
+}
+
+.avatarOption:hover {
+    border-color: var(--border-hover);
+    transform: scale(1.05);
+}
+
+.avatarOption.selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary-alpha);
+}
+
+.avatarOption img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.error {
+    color: var(--danger);
+    font-size: 14px;
+    margin: 0;
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}

@@ -21,7 +21,7 @@ export default function TemporalConfessionCard({ confession, originalVersion, cu
     return (
         <div>
             <article className={`${styles.card} ${isDeleted ? styles.deleted : ''}`}>
-                <Avatar size="md" />
+                <Avatar size="md" avatarIndex={confession.users?.avatar_index} />
                 <div className={styles.content}>
                     <div className={styles.header}>
                         <span className={styles.displayName}>{confession.users?.display_name}</span>
@@ -46,7 +46,7 @@ export default function TemporalConfessionCard({ confession, originalVersion, cu
 
             {originalVersion && (
                 <article className={`${styles.card} ${styles.original}`}>
-                    <Avatar size="md" />
+                    <Avatar size="md" avatarIndex={confession.users?.avatar_index} />
                     <div className={styles.content}>
                         <div className={styles.header}>
                             <Badge variant="danger">Original version</Badge>

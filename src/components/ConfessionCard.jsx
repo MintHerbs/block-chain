@@ -26,7 +26,7 @@ export default function ConfessionCard({ confession, currentUserId }) {
     
     return (
         <article className={styles.card}>
-            <Avatar size="md" />
+            <Avatar size="md" avatarIndex={confession.users?.avatar_index} />
             <div className={styles.content}>
                 <div className={styles.header}>
                     <span className={styles.displayName}>{confession.users?.display_name}</span>

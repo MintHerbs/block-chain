@@ -14,6 +14,23 @@ export function AuthProvider({ children }) {
             .select('*')
             .eq('id', authUserId)
             .single();
+        
+        // Backfill avatar_index and cover_color if missing
+        if (data && (data.avatar_index == null || data.cover_color == null)) {
+            const avatarIndex = data.avatar_index ?? Math.floor(Math.random() * 4) + 1;
+            const coverColors = ['#FFDDD2', '#D4E8C2', '#C9E4DE', '#D6D0F0', '#FAE1C3', '#C5D8F0', '#F5C6D0', '#D0EAD0'];
+            const coverColor = data.cover_color ?? coverColors[Math.floor(Math.random() * coverColors.length)];
+            
+            await supabase
+                .from('users')
+                .update({ avatar_index: avatarIndex, cover_color: coverColor })
+                .eq('id', authUserId);
+            
+            // Update local data to reflect changes immediately
+            data.avatar_index = avatarIndex;
+            data.cover_color = coverColor;
+        }
+        
         return data;
     }
 
@@ -51,6 +68,11 @@ export function AuthProvider({ children }) {
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
 
+        // Generate random avatar and cover color
+        const avatarIndex = Math.floor(Math.random() * 4) + 1;
+        const coverColors = ['#FFDDD2', '#D4E8C2', '#C9E4DE', '#D6D0F0', '#FAE1C3', '#C5D8F0', '#F5C6D0', '#D0EAD0'];
+        const coverColor = coverColors[Math.floor(Math.random() * coverColors.length)];
+
         // Insert the public user profile row
         const { error: insertError } = await supabase.from('users').insert({
             id: data.user.id,
@@ -59,6 +81,8 @@ export function AuthProvider({ children }) {
             email,
             password_hash: 'managed_by_supabase',
             dh_public_key: 'dh_placeholder',
+            avatar_index: avatarIndex,
+            cover_color: coverColor,
         });
         if (insertError) throw insertError;
 

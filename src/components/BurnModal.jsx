@@ -22,27 +22,37 @@ export default function BurnModal({ isOpen, onClose }) {
         setError('');
 
         try {
+            const burnedAt = new Date().toISOString();
+
             // 1. Insert into temporal_records (snapshot)
-            await supabase.from('temporal_records').insert({
-                user_id: user.id,
+            const { error: temporalError } = await supabase.from('temporal_records').insert({
+                original_user_id: user.id,
                 username: user.username,
                 display_name: user.display_name,
-                bio: user.bio,
+                blockchain_tx_hash: user.blockchain_tx_hash || null,
+                burned_at: burnedAt,
             });
 
-            // 2. Mark user as burned
-            await supabase.from('users').update({
+            if (temporalError) throw temporalError;
+
+            // 2. Mark user as burned (before deletion for audit trail)
+            const { error: updateError } = await supabase.from('users').update({
                 is_burned: true,
-                burned_at: new Date().toISOString(),
+                burned_at: burnedAt,
             }).eq('id', user.id);
 
+            if (updateError) throw updateError;
+
             // 3. Delete user (CASCADE handles confessions, comments, votes)
-            await supabase.from('users').delete().eq('id', user.id);
+            const { error: deleteError } = await supabase.from('users').delete().eq('id', user.id);
+
+            if (deleteError) throw deleteError;
 
             // 4. Sign out and redirect
             await signOut();
             navigate('/login');
         } catch (err) {
+            console.error('Burn error:', err);
             setError(err.message || 'Failed to burn account');
         } finally {
             setLoading(false);

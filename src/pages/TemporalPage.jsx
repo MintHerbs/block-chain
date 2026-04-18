@@ -21,7 +21,7 @@ export default function TemporalPage() {
         // Search users table
         const { data: users } = await supabase
             .from('users')
-            .select('username, display_name, is_burned')
+            .select('username, display_name, is_burned, avatar_index')
             .ilike('username', `%${searchTerm}%`)
             .limit(20);
 
