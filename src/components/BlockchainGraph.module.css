@@ -1,0 +1,420 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(28, 25, 23, 0.98);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.content {
+  width: 100%;
+  max-width: 1400px;
+  height: 100%;
+  max-height: 800px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.closeButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 8px 0;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.graphContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  min-height: 0;
+}
+
+.graphContainer svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Chain line animation */
+.chainLine {
+  stroke: var(--primary);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+  opacity: 0.4;
+  animation: dashMove 1.5s linear infinite;
+}
+
+@keyframes dashMove {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+/* Node styles */
+.node {
+  fill: var(--primary);
+  stroke: var(--primary);
+  stroke-width: 2;
+  opacity: 0.85;
+  cursor: pointer;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse 2s ease-in-out infinite;
+  transition: opacity 0.2s ease;
+}
+
+.node:hover {
+  opacity: 1;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+/* Node entry animation */
+.nodeEnter {
+  animation: nodeEnter 0.5s ease-out, pulse 2s ease-in-out infinite;
+}
+
+@keyframes nodeEnter {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+
+/* Ripple effect for newest node */
+.ripple {
+  fill: transparent;
+  stroke: var(--primary);
+  stroke-width: 2;
+  opacity: 0.3;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ripple 2s ease-out infinite;
+}
+
+@keyframes ripple {
+  0% {
+    r: 18;
+    opacity: 0.6;
+  }
+  100% {
+    r: 32;
+    opacity: 0;
+  }
+}
+
+/* Tooltip */
+.tooltip {
+  position: fixed;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  z-index: 10000;
+  transform: translateX(-50%);
+}
+
+.tooltipTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.tooltipDate {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 6px 0;
+}
+
+.tooltipLink {
+  font-size: 13px;
+  color: var(--primary);
+  text-decoration: none;
+  display: inline-block;
+  pointer-events: auto;
+}
+
+.tooltipLink:hover {
+  text-decoration: underline;
+}
+
+/* Empty state */
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 40px;
+}
+
+.emptyState svg {
+  margin-bottom: 24px;
+}
+
+.emptyTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 8px 0;
+}
+
+.emptyText {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+  max-width: 400px;
+}
+
+/* Node label */
+.nodeLabel {
+  font-size: 11px;
+  fill: var(--text-muted);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Expanded node styles */
+.nodeExpanded {
+  stroke-width: 3;
+  filter: drop-shadow(0 0 8px var(--primary));
+}
+
+.nodeHighlighted {
+  fill: var(--success);
+  stroke: var(--success);
+  filter: drop-shadow(0 0 12px var(--success));
+}
+
+.expandedRing {
+  fill: transparent;
+  stroke: var(--primary);
+  stroke-width: 2;
+  opacity: 0.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: expandedPulse 1.5s ease-in-out infinite;
+}
+
+.highlightRing {
+  fill: transparent;
+  stroke: var(--success);
+  stroke-width: 3;
+  opacity: 0.6;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: highlightPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes highlightPulse {
+  0%, 100% {
+    opacity: 0.6;
+    stroke-width: 3;
+  }
+  50% {
+    opacity: 0.9;
+    stroke-width: 4;
+  }
+}
+
+@keyframes expandedPulse {
+  0%, 100% {
+    opacity: 0.5;
+    stroke-width: 2;
+  }
+  50% {
+    opacity: 0.8;
+    stroke-width: 3;
+  }
+}
+
+/* Details panel */
+.detailsPanel {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 400px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.detailsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.detailsTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.detailsClose {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.detailsClose:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.detailsContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.detailRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detailLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detailValue {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-family: 'Courier New', monospace;
+  word-break: break-all;
+}
+
+.detailLink {
+  font-size: 13px;
+  color: var(--primary);
+  text-decoration: none;
+  font-family: 'Courier New', monospace;
+  word-break: break-all;
+  transition: color 0.2s ease;
+}
+
+.detailLink:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.detailBadge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--success-light);
+  color: var(--success);
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.detailsButton {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--primary);
+  color: var(--text-on-primary);
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.detailsButton:hover {
+  background: var(--primary-hover);
+}

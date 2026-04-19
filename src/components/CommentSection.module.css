@@ -65,3 +65,21 @@
     font-size: 14px;
     margin: 0;
 }
+
+.expandButton {
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.expandButton:hover {
+  background: var(--hover-bg);
+}

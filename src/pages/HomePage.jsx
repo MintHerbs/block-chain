@@ -1,16 +1,21 @@
 import { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { supabase } from '../config/supabase.js';
 import { storeConfessionOnChain } from '../security/blockchainService.js';
 import PageHeader from '../components/ui/PageHeader.jsx';
 import ComposeBox from '../components/ComposeBox.jsx';
 import ConfessionFeed from '../components/ConfessionFeed.jsx';
+import BlockchainGraph from '../components/BlockchainGraph.jsx';
 
 export default function HomePage() {
     const { user } = useAuth();
+    const { blockchainRecords } = useOutletContext();
     const [confessions, setConfessions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
+    const [isBlockchainOpen, setIsBlockchainOpen] = useState(false);
+    const [highlightConfessionId, setHighlightConfessionId] = useState(null);
 
     useEffect(() => {
         fetchConfessions();
@@ -119,6 +124,11 @@ export default function HomePage() {
         fetchConfessions(confessions.length);
     };
 
+    const handleOpenBlockchain = async (confessionId) => {
+        setHighlightConfessionId(confessionId);
+        setIsBlockchainOpen(true);
+    };
+
     return (
         <div>
             <PageHeader title="Home" />
@@ -129,7 +139,19 @@ export default function HomePage() {
                 loading={loading}
                 onLoadMore={handleLoadMore}
                 hasMore={hasMore}
+                onOpenBlockchain={handleOpenBlockchain}
             />
+            {isBlockchainOpen && (
+                <BlockchainGraph
+                    isOpen={isBlockchainOpen}
+                    onClose={() => {
+                        setIsBlockchainOpen(false);
+                        setHighlightConfessionId(null);
+                    }}
+                    initialRecords={blockchainRecords}
+                    highlightEntityId={highlightConfessionId}
+                />
+            )}
         </div>
     );
 }

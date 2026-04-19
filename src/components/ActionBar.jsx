@@ -15,6 +15,7 @@ export default function ActionBar({
     decryptedContent,
     onCommentClick,
     commentCount,
+    onShieldClick,
 }) {
     const [voteCount, setVoteCount] = useState(0);
     const [userVote, setUserVote] = useState(null); // 'up' | 'down' | null
@@ -85,6 +86,12 @@ export default function ActionBar({
     };
 
     const handleVerify = async () => {
+        // If already on blockchain and verified, clicking shield opens blockchain graph
+        if (isOnChain && verifyStatus === 'verified' && onShieldClick) {
+            onShieldClick(confessionId);
+            return;
+        }
+
         setVerifyStatus('pending');
 
         try {
@@ -114,7 +121,15 @@ export default function ActionBar({
     };
 
     const voteColor = voteCount > 0 ? 'var(--success)' : voteCount < 0 ? 'var(--danger)' : 'var(--text-secondary)';
-    const shieldColor = verifyStatus === 'verified' ? 'var(--success)' : verifyStatus === 'failed' ? 'var(--danger)' : verifyStatus === 'pending' ? 'var(--warning)' : 'var(--text-secondary)';
+    const shieldColor = isOnChain 
+        ? 'var(--success)' 
+        : verifyStatus === 'verified' 
+            ? 'var(--success)' 
+            : verifyStatus === 'failed' 
+                ? 'var(--danger)' 
+                : verifyStatus === 'pending' 
+                    ? 'var(--warning)' 
+                    : 'var(--text-secondary)';
 
     return (
         <div className={styles.actionBar}>

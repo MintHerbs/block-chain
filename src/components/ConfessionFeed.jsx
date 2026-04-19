@@ -3,7 +3,7 @@ import Loader from './ui/Loader.jsx';
 import Button from './ui/Button.jsx';
 import styles from './ConfessionFeed.module.css';
 
-export default function ConfessionFeed({ confessions, currentUserId, loading, onLoadMore, hasMore }) {
+export default function ConfessionFeed({ confessions, currentUserId, loading, onLoadMore, hasMore, onOpenBlockchain }) {
     if (loading && confessions.length === 0) {
         return (
             <div className={styles.loading}>
@@ -27,6 +27,7 @@ export default function ConfessionFeed({ confessions, currentUserId, loading, on
                     key={confession.id}
                     confession={confession}
                     currentUserId={currentUserId}
+                    onOpenBlockchain={onOpenBlockchain}
                 />
             ))}
             {hasMore && (

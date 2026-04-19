@@ -78,7 +78,7 @@ export default function CommentSection({ confessionId, currentUserId, onCommentA
         <div className={styles.wrapper}>
             <div className={styles.list}>
                 {comments.length === 0 ? (
-                    <p className={styles.empty}>No comments yet.</p>
+                    <p className={styles.empty}>No comments yet. Be the first to comment!</p>
                 ) : (
                     comments.map((comment) => (
                         <div key={comment.id} className={styles.comment}>

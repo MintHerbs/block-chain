@@ -16,7 +16,7 @@ function formatRelativeTime(timestamp) {
     return `${Math.floor(diff / 86400)}d`;
 }
 
-export default function ConfessionCard({ confession, currentUserId }) {
+export default function ConfessionCard({ confession, currentUserId, onOpenBlockchain }) {
     const [showComments, setShowComments] = useState(false);
     const [localCommentCount, setLocalCommentCount] = useState(
         confession.comments_count || 0
@@ -50,6 +50,7 @@ export default function ConfessionCard({ confession, currentUserId }) {
                     blockchainTxHash={confession.blockchain_tx_hash}
                     decryptedContent={content}
                     onCommentClick={() => setShowComments(prev => !prev)}
+                    onShieldClick={onOpenBlockchain}
                 />
                 {showComments && (
                     <CommentSection
